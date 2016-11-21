@@ -27,8 +27,15 @@ class TripsTableSeeder extends Seeder
 				{
 					$flight = $nextDestination;
 				}
-				$flights[] = $flight->id;
-				$nextDestination = Flight::where('origin', '=', $flight->destination)->orderByRaw('RAND()')->take(1)->first();
+				if (!in_array($flight->id, $flights))
+				{
+					$flights[] = $flight->id;
+					$nextDestination = Flight::where('origin', '=', $flight->destination)->orderByRaw('RAND()')->take(1)->first();
+				}
+				else
+				{
+					$j--;
+				}
 			}
 			Trip::create([
 				'name' => $name,
