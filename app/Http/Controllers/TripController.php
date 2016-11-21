@@ -6,6 +6,7 @@ use App\Trip;
 use App\Airport;
 use App\Flight;
 use App\Http\Controllers\Controller;
+use Log;
 use Illuminate\Http\Request;
 
 class TripController extends Controller
@@ -86,7 +87,43 @@ class TripController extends Controller
 
 	public function saveTrip(Request $request)
 	{
-		$trip = Trip::create($request->all());
+		//Log::info('Input Recieved: '.json_encode($request->input()));
+		$fullTrip = [];
+		$name = $request->input('name');
+		$airports = $request->input('airports');
+		$origin = $destination = null;
+		foreach($airports AS $airport)
+		{
+			if (is_null($origin))
+			{
+				$origin = $airport;
+				continue;
+			}
+			else
+			{
+				if (!is_null($destination))
+				{
+					$origin = $destination;
+					$destination = null;
+				}
+			}
+			if (is_null($destination))
+			{
+				$destination = $airport;
+				// find the flight that correspond to this origin and destination
+				$originAirport = Airport::find($origin);
+				$destinationAirport = Airport::find($destination);
+				$flight = Flight::where([
+						['origin', '=', $originAirport->code],
+						['destination', '=', $destinationAirport->code]
+				])->first();
+				$fullTrip[] = $flight->id;
+			}
+		}
+		$trip = Trip::create([
+				'name' => $name,
+				'flights' => json_encode($fullTrip)
+		]);
 		return response()->json($trip);
 	}
 
