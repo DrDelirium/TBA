@@ -21,7 +21,6 @@ class TripController extends Controller
 	 */
 	public function index()
 	{
-		// Had to add a letter to the indexes because JSON restructure "arrays" when the indexes are numerical only.
 		$trips = Trip::orderBy('name')->get();
 		if ($trips)
 		{
@@ -34,6 +33,8 @@ class TripController extends Controller
 				{
 					foreach($flights AS $fKey => $flight)
 					{
+						// We could have made two API call for the list of trips; one with just a name and one with full info.
+						// But we're on a tight schedule so we give it all, and let God sort them out.
 						$iFlight = Flight::find($flight);
 						$originAirport = Airport::where('code', '=', $iFlight->origin)->first()->toArray();
 						$destinationAirport = Airport::where('code', '=', $iFlight->destination)->first()->toArray();
@@ -120,6 +121,7 @@ class TripController extends Controller
 	public function saveTrip(Request $request)
 	{
 		//Log::info('Input Recieved: '.json_encode($request->input()));
+		// More checks needs to be done on the inputs. Just had no time to implement it.
 		$fullTrip = [];
 		$name = $request->input('name');
 		$airports = $request->input('airports');
@@ -153,6 +155,8 @@ class TripController extends Controller
 				{
 					$fullTrip[] = $flight->id;
 				}
+				// We should actually crash here with an error message if any of the flight is unknown (else{}).
+				// Because it could mean that a flight was changed/deleted.
 			}
 		}
 		$trip = Trip::create([
@@ -162,11 +166,16 @@ class TripController extends Controller
 		return response()->json(['message' => 'success']);
 	}
 
+	/**
+	 * Delete one trip. Not currently implemented in the API.
+	 *
+	 * @return string JSON
+	 */
 	public function deleteTrip($id)
 	{
 		$trip = Trip::find($id);
 		$trip->delete();
-		return response()->json('success');
+		return response()->json(['message' => 'success']);
 	}
 
 	/**
@@ -178,6 +187,7 @@ class TripController extends Controller
 	public function updateTrip(Request $request)
 	{
 		//Log::info('Input Recieved: '.json_encode($request->input()));
+		// More checks needs to be done on the inputs. Just had no time to implement it.
 		$id = $request->input('id');
 		$trip = Trip::find($id);
 		$trip->name = $request->input('name');
