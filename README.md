@@ -21,14 +21,18 @@ For a bare-minimum front-end, you can get the files from [Trip Builder Client](h
 The API will allow for the following entry points,
 
 RestFull action: GET:
-- airports: The alphabetically sorted list of all airports in the system.
-- airport/{id}: One airport, including all the possible destinations from it.
-- trips: The alphabetically sorted list of all the trips saved in the system.
-- trip: One trip, including all the previously saved origin airports and destination airport of each flight.
+- /airports : The alphabetically sorted list of all airports in the system.
+- /airport/{id} : One airport, including all the possible destinations from it.
+- /trips : The alphabetically sorted list of all the trips saved in the system.
+- /trip/{id} : One trip, including all the previously saved origin airports and destination airport of each flight.
 
 RestFull action: POST:
-- savetrip
-- updatetrip
+- /savetrip
+- /updatetrip
+
+The parameters required for the POST actions can be seen in the code.
+
+The methods to add/modify/delete airports and flights exists, but are not implemented in the routes of the API. Same with the delete for a trip.
 
 ## Installation
 
