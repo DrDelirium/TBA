@@ -8,14 +8,6 @@ Laravel Lumen is a stunningly fast PHP micro-framework for building web applicat
 
 Documentation for the framework can be found on the [Lumen website](http://lumen.laravel.com/docs).
 
-Clone or download this project file to your system, then use composer install to get all the dependencies.
-
-Don't forget to change the relevant information in the .env file.
-
-Also, due to how my local server was setup, you might need to check the /app/Http/routes.php file to correct it for your server.
-
-(Make sure you have created the database and its associated user, as seen in the .env file) Create the required tables with artisan migrate, and then fill the tables with artisan db:seed.
-
 For a bare-minimum front-end, you can get the files from [Trip Builder Client](https://github.com/DrDelirium/TBC) which is a simple HTML/jQuery page to access the API.
 
 The API will allow for the following entry points,
@@ -35,6 +27,14 @@ The parameters required for the POST actions can be seen in the code.
 The methods to add/modify/delete airports and flights exists, but are not implemented in the routes of the API. Same with the delete for a trip.
 
 ## Installation
+
+Clone or download this project file to your system, then use composer install to get all the dependencies.
+
+Don't forget to change the relevant information in the .env file.
+
+Also, due to how my local server was setup, you might need to check the /app/Http/routes.php file to correct it for your server.
+
+(Make sure you have created the database and its associated user, as seen in the .env file) Create the required tables with artisan migrate, and then fill the tables with artisan db:seed.
 
 ## License
 
