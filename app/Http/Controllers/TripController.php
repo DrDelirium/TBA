@@ -14,7 +14,8 @@ class TripController extends Controller
 
 	public function index()
 	{
-		$trips = Trip::all();
+		// Had to add a letter to the indexes because JSON restructure "arrays" when the indexes are numerical only.
+		$trips = Trip::orderBy('name')->get();
 		if ($trips)
 		{
 			$fullTripInfo = [];
@@ -24,19 +25,22 @@ class TripController extends Controller
 				$flightInfo = [];
 				if ($flights)
 				{
-					foreach($flights AS $flight)
+					foreach($flights AS $fKey => $flight)
 					{
 						$iFlight = Flight::find($flight);
 						$originAirport = Airport::where('code', '=', $iFlight->origin)->first()->toArray();
 						$destinationAirport = Airport::where('code', '=', $iFlight->destination)->first()->toArray();
-						$flightInfo[$iFlight->id] = [
-							  'origin' => $originAirport
+						$flightInfo[] = [
+								'flightorder' => $fKey
+							, 'id' => $iFlight->id
+							, 'origin' => $originAirport
 							, 'destination' => $destinationAirport
 						];
 					}
 				}
-				$fullTripInfo[$trip->id] = [
-					  'name' => $trip->name
+				$fullTripInfo[] = [
+						'id' => $trip->id
+					, 'name' => $trip->name
 					, 'flights' => $flightInfo
 				];
 			}
@@ -55,23 +59,29 @@ class TripController extends Controller
 			$trip = Trip::find(intval($id));
 			if ($trip)
 			{
-				$result = $trip->toArray();
 				$flights = json_decode($trip->flights);
 				$flightInfo = [];
 				if ($flights)
 				{
-					foreach($flights AS $flight)
+					foreach($flights AS $fKey => $flight)
 					{
 						$iFlight = Flight::find($flight);
 						$originAirport = Airport::where('code', '=', $iFlight->origin)->first()->toArray();
 						$destinationAirport = Airport::where('code', '=', $iFlight->destination)->first()->toArray();
-						$flightInfo[$iFlight->id] = [
-							  'origin' => $originAirport
+						$flightInfo[] = [
+								'flightorder' => $fKey
+							, 'id' => $iFlight->id
+							, 'origin' => $originAirport
 							, 'destination' => $destinationAirport
 						];
 					}
 				}
-				$result['flights'] = $flightInfo;
+				$result = [
+						'id' => $trip->id
+					, 'name' => $trip->name
+					, 'flightlist' => $flights
+					, 'flights' => $flightInfo
+				];
 				return response()->json($result);
 			}
 			else
@@ -117,14 +127,17 @@ class TripController extends Controller
 						['origin', '=', $originAirport->code],
 						['destination', '=', $destinationAirport->code]
 				])->first();
-				$fullTrip[] = $flight->id;
+				if ($flight)
+				{
+					$fullTrip[] = $flight->id;
+				}
 			}
 		}
 		$trip = Trip::create([
 				'name' => $name,
 				'flights' => json_encode($fullTrip)
 		]);
-		return response()->json($trip);
+		return response()->json(['message' => 'success']);
 	}
 
 	public function deleteTrip($id)
@@ -134,13 +147,51 @@ class TripController extends Controller
 		return response()->json('success');
 	}
 
-	public function updateTrip(Request $request, $id)
+	public function updateTrip(Request $request)
 	{
+		//Log::info('Input Recieved: '.json_encode($request->input()));
+		$id = $request->input('id');
 		$trip = Trip::find($id);
 		$trip->name = $request->input('name');
-		$trip->flights = json_encode($request->input('flights'));
+		$airports = $request->input('airports');
+		$fullTrip = [];
+		$origin = $destination = null;
+		foreach($airports AS $airport)
+		{
+			if (is_null($origin))
+			{
+				$origin = $airport;
+				continue;
+			}
+			else
+			{
+				if (!is_null($destination))
+				{
+					$origin = $destination;
+					$destination = null;
+				}
+			}
+			if (is_null($destination))
+			{
+				$destination = $airport;
+				// find the flight that correspond to this origin and destination
+				$originAirport = Airport::find($origin);
+				$destinationAirport = Airport::find($destination);
+				//Log::info('Searching for a flight between: '.$originAirport->code.' and '.$destinationAirport->code);
+				$flight = Flight::where([
+						['origin', '=', $originAirport->code],
+						['destination', '=', $destinationAirport->code]
+				])->first();
+				if ($flight)
+				{
+					$fullTrip[] = $flight->id;
+					//Log::info('Flight id: '.$flight->id.' found.');
+				}
+			}
+		}
+		$trip->flights = json_encode($fullTrip);
 		$trip->save();
-		return response()->json($trip);
+		return response()->json(['message' => 'success']);
 	}
 
 }

@@ -8,5 +8,6 @@ class Trip extends Model
 {
 
 	protected $fillable = ['name', 'flights'];
+	protected $hidden = ['created_at', 'updated_at'];
 
 }

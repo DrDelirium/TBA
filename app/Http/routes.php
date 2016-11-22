@@ -21,3 +21,5 @@ $app->get('/TBA/public/airports','AirportController@index');
 $app->get('/TBA/public/airport/{id}','AirportController@getAirport');
 $app->get('/TBA/public/trips','TripController@index');
 $app->get('/TBA/public/trip/{id}','TripController@getTrip');
+$app->post('/TBA/public/savetrip','TripController@saveTrip');
+$app->post('/TBA/public/updatetrip','TripController@updateTrip');

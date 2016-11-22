@@ -11,6 +11,7 @@ class FlightsTableSeeder extends Seeder
 
 	public function run()
 	{
+		$flights = [];
 		$airports = Airport::all()->toArray();
 		$airNum = count($airports);
 		foreach($airports AS $aX => $airport)
@@ -26,11 +27,15 @@ class FlightsTableSeeder extends Seeder
 					$destX = mt_rand(0, ($airNum-1));
 				}
 				$destination = $airports[$destX]['code'];
-				Flight::create([
-					'origin' => $origin,
-					'destination' => $destination
-				]);
-				$i++;
+				if (!isset($flights[$origin]) || (isset($flights[$origin]) && !isset($flights[$origin][$destination])))
+				{
+					$flights[$origin][$destination] = true;
+					Flight::create([
+						'origin' => $origin,
+						'destination' => $destination
+					]);
+					$i++;
+				}
 			}
 		}
 	}

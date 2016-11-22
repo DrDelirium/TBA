@@ -17,9 +17,10 @@ class AirportController extends Controller
 
 	public function getAirport($id)
 	{
-		if (intval($id) !== 0)
+		$iID = intval($id);
+		if ($iID !== 0)
 		{
-			$airport = Airport::find(intval($id));
+			$airport = Airport::find(intval($iID));
 			if ($airport)
 			{
 				$result = $airport->toArray();
@@ -30,7 +31,7 @@ class AirportController extends Controller
 					foreach($flights AS $flight)
 					{
 						$destination = Airport::where('code', $flight->destination)->first()->toArray();
-						$destinations[$flight->id] = $destination;
+						$destinations['F'.$flight->id] = $destination;
 					}
 					uasort($destinations, function ($a, $b) {
 		          return strnatcasecmp($a['name'],$b['name']);
@@ -58,64 +59,65 @@ class AirportController extends Controller
 
 	public function deleteAirport($id)
 	{
-		$airport = Airport::find($id);
-		$origins = $airport->origin;
-		if ($origins)
+		$iID = intval(substr($id, 1));
+		if ($iID !== 0)
 		{
-			foreach($origins AS $flight)
+			$airport = Airport::find($iID);
+			if ($airport)
 			{
-				$flight->delete();
+				$origins = $airport->origin;
+				if ($origins)
+				{
+					foreach($origins AS $flight)
+					{
+						$flight->delete();
+					}
+				}
+				$destinations = $airport->destinations;
+				if ($destinations)
+				{
+					foreach($destinations AS $flight)
+					{
+						$flight->delete();
+					}
+				}
+				$airport->delete();
+				return response()->json('success');
+			}
+			else
+			{
+				return response()->json(['error'=>'unknown airport'], 500);
 			}
 		}
-		$destinations = $airport->destinations;
-		if ($destinations)
+		else
 		{
-			foreach($destinations AS $flight)
-			{
-				$flight->delete();
-			}
+			return response()->json(['error'=>'wrong parameter'], 500);
 		}
-		$airport->delete();
-		return response()->json('success');
 	}
 
 	public function updateAirport(Request $request, $id)
 	{
-		$airport = Airport::find($id);
-		$airport->name = $request->input('name');
-		$airport->country = $request->input('country');
-		$airport->code = $request->input('code');
-		$airport->save();
-		return response()->json($airport);
-	}
-
-	// Sort a class by one of its members (even lowercase!!!)
-	public static function recordSort($records, $field, $reverse=false)
-	{
-			$hash = [];
-
-			foreach($records as $key => $record)
+		$iID = intval(substr($id, 1));
+		if ($iID !== 0)
+		{
+			$airport = Airport::find($iID);
+			if ($airport)
 			{
-					$record['xyzKey'] = $key;
-					$hash[$record[$field].$key] = $record;
+				$airport->name = $request->input('name');
+				$airport->country = $request->input('country');
+				$airport->code = $request->input('code');
+				$airport->save();
+				return response()->json($airport);
 			}
-
-			($reverse)? krsort($hash) : ksort($hash);
-
-			$newrecords = [];
-
-			foreach($hash as $record)
+			else
 			{
-					$oldKey = $record['xyzKey'];
-					unset($record['xyzKey']);
-					$newrecords[$oldKey] = $record;
+				return response()->json(['error'=>'unknown airport'], 500);
 			}
-
-			return $newrecords;
-	}
-
-	public function nameSort($a,$b) {
-		return $a['name']>$b['name'];
+		}
+		else
+		{
+			return response()->json(['error'=>'wrong parameter'], 500);
+		}
 	}
 
 }
