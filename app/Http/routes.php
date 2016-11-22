@@ -11,9 +11,12 @@
 |
 */
 
+	/**
+	 * For some reason, I am unable to use routes like '/', but have to use the full qualified route of '/TBA/public/'.
+	 * I expect it is due to my web server setup, so these might have to be changed when going on a real server.
+	 */
+
 $app->get('/TBA/public/', function () use ($app) {
-    //return $app->version();
-	//return $app->welcome();
 	return json_encode(['hello'=>'world']);
 });
 

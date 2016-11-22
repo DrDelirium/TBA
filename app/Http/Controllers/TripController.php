@@ -12,6 +12,13 @@ use Illuminate\Http\Request;
 class TripController extends Controller
 {
 
+	/**
+	 * Return all the trips in the system.
+	 * Trips are composed of their individual information (id, timestamps) and all the flights they are associated to.
+	 * The flights have the origin and destination airport information as well.
+	 *
+	 * @return string JSON
+	 */
 	public function index()
 	{
 		// Had to add a letter to the indexes because JSON restructure "arrays" when the indexes are numerical only.
@@ -52,6 +59,15 @@ class TripController extends Controller
 		}
 	}
 
+	/**
+	 * Return one trip.
+	 * Trip id composed of its individual information (id, timestamps) and all the flights it is associated to.
+	 * The flights have the origin and destination airport information as well.
+	 *
+   * @param mixed $id
+	 *
+	 * @return string JSON
+	 */
 	public function getTrip($id)
 	{
 		if (intval($id) !== 0)
@@ -95,6 +111,12 @@ class TripController extends Controller
 		}
 	}
 
+	/**
+	 * Create one trip.
+	 * The array saved in the flights variable is the id of each flight that correspond to an origin airport and destination airport.
+	 *
+	 * @return string JSON
+	 */
 	public function saveTrip(Request $request)
 	{
 		//Log::info('Input Recieved: '.json_encode($request->input()));
@@ -147,6 +169,12 @@ class TripController extends Controller
 		return response()->json('success');
 	}
 
+	/**
+	 * Updates one trip.
+	 * The array saved in the flights variable is the id of each flight that correspond to an origin airport and destination airport.
+	 *
+	 * @return string JSON
+	 */
 	public function updateTrip(Request $request)
 	{
 		//Log::info('Input Recieved: '.json_encode($request->input()));

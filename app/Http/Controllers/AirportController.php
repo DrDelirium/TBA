@@ -9,12 +9,24 @@ use Illuminate\Http\Request;
 class AirportController extends Controller
 {
 
+	/**
+	 * Return the list of all airports.
+	 *
+	 * @return string JSON
+	 */
 	public function index()
 	{
 		$airports = Airport::orderBy('name')->get();
 		return response()->json($airports);
 	}
 
+	/**
+	 * Return one airport with a list of all destination airports that starts from there.
+	 *
+   * @param mixed $id
+	 *
+	 * @return string JSON
+	 */
 	public function getAirport($id)
 	{
 		$iID = intval($id);
@@ -51,15 +63,27 @@ class AirportController extends Controller
 		}
 	}
 
+	/**
+	 * Return the saved airport information. Not currently implemented in the API.
+	 *
+	 * @return string JSON
+	 */
 	public function saveAirport(Request $request)
 	{
 		$airport = Airport::create($request->all());
 		return response()->json($airport);
 	}
 
+	/**
+	 * Deletes one airport. Not currently implemented for the API.
+	 *
+   * @param mixed $id
+	 *
+	 * @return string JSON
+	 */
 	public function deleteAirport($id)
 	{
-		$iID = intval(substr($id, 1));
+		$iID = intval($id);
 		if ($iID !== 0)
 		{
 			$airport = Airport::find($iID);
@@ -95,9 +119,14 @@ class AirportController extends Controller
 		}
 	}
 
-	public function updateAirport(Request $request, $id)
+	/**
+	 * Updates one airport. Not currently implemented in the API.
+	 *
+	 * @return string JSON
+	 */
+	public function updateAirport(Request $request)
 	{
-		$iID = intval(substr($id, 1));
+		$iID = intval($id);
 		if ($iID !== 0)
 		{
 			$airport = Airport::find($iID);
