@@ -15,6 +15,7 @@ RestFull action: GET:
 - airport/{id}: One airport, including all the possible destinations from it.
 - trips: The alphabetically sorted list of all the trips saved in the system.
 - trip: One trip, including all the previously saved origin airports and destination airport of each flight.
+
 RestFull action: POST:
 - savetrip
 - updatetrip
